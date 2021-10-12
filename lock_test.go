@@ -15,6 +15,7 @@ func fibonacci(num int) int{
 }
 // 控制并发量
 const concurency=1000
+// 模拟其他任务
 const othergrt=0
 
 func BenchmarkLock(b *testing.B) {
@@ -166,14 +167,4 @@ func BenchmarkLongTaskSpinLock(b *testing.B) {
 //	wg.Wait()
 //}
 
-
-var mu sync.Mutex
-
-func main()  {
-	var cnt int32
-	mu.Lock()
-	cnt++
-	mu.Unlock()
-	atomic.AddInt32(&cnt,1)
-}
 
