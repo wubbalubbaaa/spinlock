@@ -1,26 +1,28 @@
-package gmutex
+package spinlock
 
 import (
-	"gmutex/internal"
+	"spinlock/internal"
 	"sync"
 	"sync/atomic"
 	"testing"
 )
 
-func fibonacci(num int) int{
-	if num<2{
+func fibonacci(num int) int {
+	if num < 2 {
 		return 1
 	}
 	return fibonacci(num-1) + fibonacci(num-2)
 }
+
 // 控制并发量
-const concurency=1000
+const concurency = 1000
+
 // 模拟其他任务
-const othergrt=0
+const othergrt = 0
 
 func BenchmarkLock(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j:=0;j<othergrt;j++{
+		for j := 0; j < othergrt; j++ {
 			go func() {
 				fibonacci(20)
 			}()
@@ -28,10 +30,10 @@ func BenchmarkLock(b *testing.B) {
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		wg.Add(concurency)
-		cnt:=0
-		for j:=0;j<concurency;j++{
+		cnt := 0
+		for j := 0; j < concurency; j++ {
 			go func() {
-				for k:=0;k<100;k++{
+				for k := 0; k < 100; k++ {
 					mu.Lock()
 					cnt++
 					mu.Unlock()
@@ -43,22 +45,20 @@ func BenchmarkLock(b *testing.B) {
 	}
 }
 
-
-
-func BenchmarkSpinLock(b *testing.B)  {
+func BenchmarkSpinLock(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j:=0;j<othergrt;j++{
+		for j := 0; j < othergrt; j++ {
 			go func() {
 				fibonacci(20)
 			}()
 		}
-		sp:=internal.NewSpinLock()
+		sp := internal.NewSpinLock()
 		var wg sync.WaitGroup
 		wg.Add(concurency)
-		cnt:=0
-		for j:=0;j<concurency;j++{
+		cnt := 0
+		for j := 0; j < concurency; j++ {
 			go func() {
-				for k:=0;k<100;k++{
+				for k := 0; k < 100; k++ {
 					sp.Lock()
 					cnt++
 					sp.Unlock()
@@ -70,24 +70,22 @@ func BenchmarkSpinLock(b *testing.B)  {
 	}
 }
 
-
-
-func BenchmarkAtomic(b *testing.B)  {
+func BenchmarkAtomic(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j:=0;j<othergrt;j++{
+		for j := 0; j < othergrt; j++ {
 			go func() {
 				fibonacci(20)
 			}()
 		}
-		sp:=internal.NewSpinLock()
+		sp := internal.NewSpinLock()
 		var wg sync.WaitGroup
 		wg.Add(concurency)
-		var cnt int32=0
-		for j:=0;j<concurency;j++{
+		var cnt int32 = 0
+		for j := 0; j < concurency; j++ {
 			go func() {
-				for k:=0;k<100;k++{
+				for k := 0; k < 100; k++ {
 					sp.Lock()
-					atomic.AddInt32(&cnt,1)
+					atomic.AddInt32(&cnt, 1)
 					sp.Unlock()
 				}
 				wg.Done()
@@ -96,12 +94,10 @@ func BenchmarkAtomic(b *testing.B)  {
 		wg.Wait()
 	}
 }
-
-
 
 func BenchmarkLongTaskMutex(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j:=0;j<othergrt;j++{
+		for j := 0; j < othergrt; j++ {
 			go func() {
 				fibonacci(20)
 			}()
@@ -109,9 +105,9 @@ func BenchmarkLongTaskMutex(b *testing.B) {
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		wg.Add(concurency)
-		for j:=0;j<concurency;j++{
+		for j := 0; j < concurency; j++ {
 			go func() {
-				for k:=0;k<100;k++{
+				for k := 0; k < 100; k++ {
 					mu.Lock()
 					fibonacci(20)
 					mu.Unlock()
@@ -123,20 +119,19 @@ func BenchmarkLongTaskMutex(b *testing.B) {
 	}
 }
 
-
 func BenchmarkLongTaskSpinLock(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j:=0;j<othergrt;j++{
+		for j := 0; j < othergrt; j++ {
 			go func() {
 				fibonacci(20)
 			}()
 		}
-		sp:=internal.NewSpinLock()
+		sp := internal.NewSpinLock()
 		var wg sync.WaitGroup
 		wg.Add(concurency)
-		for j:=0;j<concurency;j++{
+		for j := 0; j < concurency; j++ {
 			go func() {
-				for k:=0;k<100;k++{
+				for k := 0; k < 100; k++ {
 					sp.Lock()
 					fibonacci(20)
 					sp.Unlock()
@@ -147,6 +142,7 @@ func BenchmarkLongTaskSpinLock(b *testing.B) {
 		wg.Wait()
 	}
 }
+
 //
 //func TestSpinLock(t *testing.T) {
 //	sp:=internal.NewSpinLock()
@@ -166,5 +162,3 @@ func BenchmarkLongTaskSpinLock(b *testing.B) {
 //	}
 //	wg.Wait()
 //}
-
-
