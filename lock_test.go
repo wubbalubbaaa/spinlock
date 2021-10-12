@@ -22,11 +22,6 @@ const othergrt = 0
 
 func BenchmarkLock(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < othergrt; j++ {
-			go func() {
-				fibonacci(20)
-			}()
-		}
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		wg.Add(concurency)
@@ -47,11 +42,7 @@ func BenchmarkLock(b *testing.B) {
 
 func BenchmarkSpinLock(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < othergrt; j++ {
-			go func() {
-				fibonacci(20)
-			}()
-		}
+
 		sp := internal.NewSpinLock()
 		var wg sync.WaitGroup
 		wg.Add(concurency)
@@ -72,11 +63,7 @@ func BenchmarkSpinLock(b *testing.B) {
 
 func BenchmarkAtomic(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < othergrt; j++ {
-			go func() {
-				fibonacci(20)
-			}()
-		}
+
 		sp := internal.NewSpinLock()
 		var wg sync.WaitGroup
 		wg.Add(concurency)
@@ -97,11 +84,7 @@ func BenchmarkAtomic(b *testing.B) {
 
 func BenchmarkLongTaskMutex(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < othergrt; j++ {
-			go func() {
-				fibonacci(20)
-			}()
-		}
+
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		wg.Add(concurency)
@@ -109,7 +92,7 @@ func BenchmarkLongTaskMutex(b *testing.B) {
 			go func() {
 				for k := 0; k < 100; k++ {
 					mu.Lock()
-					fibonacci(20)
+					fibonacci(20) // 用斐波拉契数列模拟在临界区相对较长的任务时间
 					mu.Unlock()
 				}
 				wg.Done()
@@ -121,11 +104,7 @@ func BenchmarkLongTaskMutex(b *testing.B) {
 
 func BenchmarkLongTaskSpinLock(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < othergrt; j++ {
-			go func() {
-				fibonacci(20)
-			}()
-		}
+
 		sp := internal.NewSpinLock()
 		var wg sync.WaitGroup
 		wg.Add(concurency)
@@ -133,7 +112,7 @@ func BenchmarkLongTaskSpinLock(b *testing.B) {
 			go func() {
 				for k := 0; k < 100; k++ {
 					sp.Lock()
-					fibonacci(20)
+					fibonacci(20) // 用斐波拉契数列模拟在临界区相对较长的任务时间
 					sp.Unlock()
 				}
 				wg.Done()
@@ -143,22 +122,9 @@ func BenchmarkLongTaskSpinLock(b *testing.B) {
 	}
 }
 
-//
-//func TestSpinLock(t *testing.T) {
-//	sp:=internal.NewSpinLock()
-//	cnt:=0
-//	var wg sync.WaitGroup
-//	wg.Add(3)
-//	for j:=0;j<3;j++{
-//		go func() {
-//			for k:=0;k<100;k++{
-//				sp.Lock()
-//				cnt++
-//				fmt.Println(cnt)
-//				sp.Unlock()
-//			}
-//			wg.Done()
-//		}()
+//func BenchmarkTestFib(b *testing.B) {
+//	for i := 0; i < b.N; i++ {
+//		fibonacci(30)
 //	}
-//	wg.Wait()
 //}
+
