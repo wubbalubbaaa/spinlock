@@ -15,7 +15,7 @@ func fibonacci(num int) int {
 }
 
 // 控制并发量
-const concurency = 1000
+const concurency = 10000
 
 // 模拟其他任务
 const othergrt = 0
@@ -30,6 +30,7 @@ func BenchmarkLock(b *testing.B) {
 			go func() {
 				for k := 0; k < 100; k++ {
 					mu.Lock()
+					cnt++
 					cnt++
 					mu.Unlock()
 				}
@@ -52,6 +53,7 @@ func BenchmarkSpinLock(b *testing.B) {
 				for k := 0; k < 100; k++ {
 					sp.Lock()
 					cnt++
+					cnt++
 					sp.Unlock()
 				}
 				wg.Done()
@@ -70,6 +72,7 @@ func BenchmarkAtomic(b *testing.B) {
 		for j := 0; j < concurency; j++ {
 			go func() {
 				for k := 0; k < 100; k++ {
+					atomic.AddInt32(&cnt, 1)
 					atomic.AddInt32(&cnt, 1)
 				}
 				wg.Done()
