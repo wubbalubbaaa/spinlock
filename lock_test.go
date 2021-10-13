@@ -64,16 +64,13 @@ func BenchmarkSpinLock(b *testing.B) {
 func BenchmarkAtomic(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 
-		sp := internal.NewSpinLock()
 		var wg sync.WaitGroup
 		wg.Add(concurency)
 		var cnt int32 = 0
 		for j := 0; j < concurency; j++ {
 			go func() {
 				for k := 0; k < 100; k++ {
-					sp.Lock()
 					atomic.AddInt32(&cnt, 1)
-					sp.Unlock()
 				}
 				wg.Done()
 			}()
