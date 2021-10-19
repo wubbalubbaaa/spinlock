@@ -11,11 +11,12 @@ func fibonacci(num int) int {
 	if num < 2 {
 		return 1
 	}
+
 	return fibonacci(num-1) + fibonacci(num-2)
 }
 
 // 控制并发量
-const concurency = 10000
+const concurency = 1000
 
 // 模拟其他任务
 const othergrt = 0
@@ -124,7 +125,7 @@ func BenchmarkLongTaskSpinLock(b *testing.B) {
 
 //func BenchmarkTestFib(b *testing.B) {
 //	for i := 0; i < b.N; i++ {
-//		fibonacci(30)
+//		fmt.Println(2<<1)
 //	}
 //}
 
