@@ -12,16 +12,20 @@ import (
 
 type SpinLock uint32
 
-const maxBackoff = 64
+const maxBackoff = 1024
 
 func (sl *SpinLock) Lock() {
-	backoff,cnt := 1,1
-	lockedOSThread:=false
+	backoff, cnt := 1, 1
+	lockedOSThread := false
 	for !atomic.CompareAndSwapUint32((*uint32)(sl), 0, 1) {
-		// Leverage the exponential backoff algorithm, see https://en.wikipedia.org/wiki/Exponential_backoff.
-		if cnt==backoff{lockedOSThread=true;runtime.LockOSThread()}
+		if cnt == maxBackoff {
+			lockedOSThread = true
+			runtime.LockOSThread()
+		}
 		if cnt < backoff {
 			cnt++
+		}
+		for i:=0;i<cnt/16;i++{
 			continue
 		}
 		for i := 0; i < backoff; i++ {
@@ -31,7 +35,7 @@ func (sl *SpinLock) Lock() {
 			backoff <<= 1
 		}
 	}
-	if lockedOSThread{
+	if lockedOSThread {
 		runtime.UnlockOSThread()
 	}
 }
